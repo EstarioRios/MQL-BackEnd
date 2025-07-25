@@ -1,22 +1,30 @@
-"""
-URL configuration for MQL project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
 from django.urls import path
+from AuthenticationSystem import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # ✅ Signup normal user (user_type="normal")
+    # POST /api/signup/
+    # Required fields: email, phone_number, password, first_name, last_name, user_type
+    path("signup/", views.signup, name="signup"),
+
+    # ✅ Login (JWT-based, fallback to manual login if token not valid)
+    # POST /api/login/
+    # Required fields: email, password
+    # Optional field: remember (boolean)
+    path("login/", views.login, name="login"),
+
+    # ✅ Manually login if JWT not present or failed
+    # Used internally by login view
+    # Do NOT use directly unless debugging
+    path("manual-login/", views.manual_login, name="manual_login"),
+
+    # ✅ Create new admin user (Requires JWT and must be admin)
+    # POST /api/create-admin/
+    # Required fields: first_name, last_name, email, password, phone_number
+    path("create-admin/", views.create_admin, name="create_admin"),
+
+    # ✅ Submit a new order (Authenticated users only)
+    # POST /api/sub-order/
+    # Required fields: title, description, tools_description
+    path("sub-order/", views.sub_order, name="sub_order"),
 ]
