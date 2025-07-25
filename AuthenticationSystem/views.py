@@ -7,8 +7,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 
-from .models import CustomUser, Ed_Class
-from .serializers import CustomUserDetailSerializer
+from .models import CustomUser, Order
+from .serializers import (
+    CustomUserDetailSerializers,
+    CustomUser,
+    Order,
+    OrderDetailSerializers,
+    OrderListSerializers,
+    CustomUserListSerializers,
+)
 
 
 # Generate JWT access and refresh tokens for a user
@@ -27,7 +34,7 @@ def choose_dashboard(user, tokens, msg="Login successful", remember=False):
             {
                 "user_type": user.user_type,
                 "success": msg,
-                "user": CustomUserDetailSerializer(user).data,
+                "user": CustomUserDetailSerializers(user).data,
             },
             status=status.HTTP_200_OK,
         )
@@ -38,7 +45,7 @@ def choose_dashboard(user, tokens, msg="Login successful", remember=False):
                     "user_type": user.user_type,
                     "success": msg,
                     "tokens": tokens,
-                    "user": CustomUserDetailSerializer(user).data,
+                    "user": CustomUserDetailSerializers(user).data,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -47,7 +54,7 @@ def choose_dashboard(user, tokens, msg="Login successful", remember=False):
                 {
                     "user_type": user.user_type,
                     "success": msg,
-                    "user": CustomUserDetailSerializer(user).data,
+                    "user": CustomUserDetailSerializers(user).data,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -109,7 +116,7 @@ def signup(request):
             return Response(
                 {
                     "msg": "user created",
-                    "user": CustomUserDetailSerializer(user).data,
+                    "user": CustomUserDetailSerializers(user).data,
                     "tokens": get_tokens_for_user(user),
                 }
             )
@@ -213,6 +220,52 @@ def create_admin(request):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+    except ValueError as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def sub_order(request):
+    user_auth = JWTAuthentication().authenticate(request)
+    if not user_auth:
+        return Response(
+            {"error": "your JWT is not ok"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    user, _ = user_auth
+
+    order_title = request.data.get("title")
+    order_owner = user
+    order_description = request.data.get("description")
+    order_tools_description = request.data.get("tools_description")
+
+    if not all(
+        [
+            order_description,
+            order_title,
+            order_tools_description,
+            order_owner,
+        ]
+    ):
+        return Response(
+            {
+                "error": "order_description, order_title, order_tools_description, order_owner are requiremented"
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    try:
+        order = Order.objects.create(
+            title=order_title,
+            owner=order_owner,
+            description=order_description,
+            tools_description=order_tools_description,
+        )
+        order.save()
     except ValueError as e:
         return Response(
             {"error": str(e)},

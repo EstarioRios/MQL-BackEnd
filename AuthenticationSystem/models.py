@@ -105,7 +105,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     user_type = models.CharField(max_length=50, choices=USER_TYPES, default="normal")
-    phone_number = models.PhoneNumberField(unique=True, blank=False, null=False)
+    phone_number = PhoneNumberField(unique=True, blank=False, null=False)
     email = models.EmailField(max_length=254, unique=True)
     active_mode = models.BooleanField(default=True)
 
@@ -131,7 +131,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = [
         "first_name",
         "last_name",
-        "email",
         "phone_number",
     ]
 
