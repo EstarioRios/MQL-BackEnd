@@ -7,13 +7,13 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
+from phonenumber_field.modelfields import PhoneNumberField
+
+
 # from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager):
-    def get_by_natural_key(self, id_code):
-        return self.get(id_code=id_code)
-
     def create_normal(
         self,
         first_name=None,
@@ -126,12 +126,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         related_query_name="customuser",
     )
 
-    def get_by_natural_key(self, id_code):
-        return self.get(id_code=id_code)
-
     objects = CustomUserManager()
-    USERNAME_FIELD = "id"
-    REQUIRED_FIELDS = ["first_name", "last_name"]
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = [
+        "first_name",
+        "last_name",
+        "email",
+        "phone_number",
+    ]
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
