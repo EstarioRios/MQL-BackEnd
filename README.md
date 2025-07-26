@@ -121,6 +121,7 @@ GitHub: @EstarioRios
 This project is licensed under the MIT License.
 
 ✨ Future Enhancements (Optional Ideas)
+
 ✅ Add JWT support with refresh tokens
 
 ✅ Email confirmation during registration
