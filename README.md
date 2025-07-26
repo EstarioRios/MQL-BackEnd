@@ -98,7 +98,7 @@ Endpoint	Method	Description
      Required fields: email, password
      Optional field: remember (boolean)
 
-✅ Manually login if JWT not present or failed
+ ✅ Manually login if JWT not present or failed
     POST /api/manual-login/
     Required fields: email, password
 
