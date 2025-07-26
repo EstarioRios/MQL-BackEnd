@@ -89,10 +89,26 @@ The backend will be available at: http://127.0.0.1:8000/
 ## 🔌 API Endpoints
 Endpoint	Method	Description
 ```txt
-/register/	POST	Register a new user
-/login/	POST	Authenticate & receive token
-/profile/	GET	Retrieve authenticated user
-/logout/	POST	Logout user (if available)
+ ✅ Signup normal user (user_type="normal")
+     POST /api/signup/
+     Required fields: email, phone_number, password, first_name, last_name
+
+ ✅ Login (JWT-based, fallback to manual login if token not valid)
+     POST /api/login/
+     Required fields: email, password
+     Optional field: remember (boolean)
+
+✅ Manually login if JWT not present or failed
+    POST /api/manual-login/
+    Required fields: email, password
+
+ ✅ Create new admin user (Requires JWT and must be admin)
+     POST /api/create-admin/
+     Required fields: first_name, last_name, email, password, phone_number
+
+ ✅ Submit a new order (Authenticated users only)
+    POST /api/sub-order /
+    Required fields: title, description, tools_description
 ```
 These endpoints are implemented inside the AuthenticationSystem app using Django REST views and serializers.
 
