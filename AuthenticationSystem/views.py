@@ -66,7 +66,6 @@ def choose_dashboard(user, tokens, msg="Login successful", remember=False):
 def signup(request):
 
     # Extract new user data
-    user_user_type = request.data.get("user_type")
     user_email = request.data.get("email")
     user_phone_number = request.data.get("phone_number")
     user_password = request.data.get("password")
@@ -76,7 +75,6 @@ def signup(request):
     # Check for required fields
     if not all(
         [
-            user_user_type,
             user_phone_number,
             user_email,
             user_password,
@@ -91,41 +89,41 @@ def signup(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    if user_user_type == "normal":
-        try:
-            if CustomUser.objects.filter(email=user_email).exists():
-                return Response(
-                    {"error": f"email: {user_email} is already exist"},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-            try:
-                user = CustomUser.objects.create_normal(
-                    user_type="normal",
-                    phone_number=user_phone_number,
-                    email=user_email,
-                    first_name=user_first_name,
-                    last_name=user_last_name,
-                    password=user_password,
-                )
-            except ValueError as e:
-                return Response(
-                    {"error": str(e)},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-
+    try:
+        if CustomUser.objects.filter(email=user_email).exists():
             return Response(
-                {
-                    "msg": "user created",
-                    "user": CustomUserDetailSerializers(user).data,
-                    "tokens": get_tokens_for_user(user),
-                }
+                {"error": f"email: {user_email} is already exist"},
+                status=status.HTTP_403_FORBIDDEN,
             )
-
+        try:
+            user = CustomUser.objects.create_normal(
+                user_type="normal",
+                phone_number=user_phone_number,
+                email=user_email,
+                first_name=user_first_name,
+                last_name=user_last_name,
+                password=user_password,
+            )
         except ValueError as e:
             return Response(
                 {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_403_FORBIDDEN,
             )
+
+        return Response(
+            {
+                "msg": "user created",
+                "user": CustomUserDetailSerializers(user).data,
+                "tokens": get_tokens_for_user(user),
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    except ValueError as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 # Manual login if JWT not present
@@ -159,22 +157,26 @@ def manual_login(request, remember):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login(request):
-    remember = request.data.get("remember")
-    if not remember:
-        remember = False
+    remember = False
 
     try:
 
         user_auth = JWTAuthentication().authenticate(request)
         if not user_auth:
-            return manual_login(request, remember=remember)
+            return Response(
+                {"error": "JWT is not ok"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         else:
             user, _ = user_auth
             return choose_dashboard(user, tokens=None, remember=False)
 
     except AuthenticationFailed:
-        return manual_login(request, remember=remember)
+        return Response(
+            {"error": "JWT is not ok"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 @api_view(["POST"])
@@ -214,6 +216,13 @@ def create_admin(request):
                 last_name=last_name,
                 phone_number=phone_number,
                 email=email,
+            )
+            return Response(
+                {
+                    "msg": "admin created",
+                    "user": CustomUserDetailSerializers(user).data,
+                },
+                status=status.HTTP_200_OK,
             )
         except ValueError as e:
             return Response(
@@ -266,6 +275,13 @@ def sub_order(request):
             tools_description=order_tools_description,
         )
         order.save()
+        return Response(
+            {
+                "msg": "Order created",
+                "order": OrderDetailSerializers(order).data,
+            },
+            status=status.HTTP_200_OK,
+        )
     except ValueError as e:
         return Response(
             {"error": str(e)},
