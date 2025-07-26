@@ -1,6 +1,18 @@
-# 🔐 MQL BackEnd — Django REST API for Authentication
+# 🔐 MQL BackEnd — Django REST API MVP Version 🧠 
 
-Welcome to the official **MQL BackEnd** repository — a secure, scalable, and lightweight authentication system built using **Django** and **Django REST Framework (DRF)**. This project provides clean and modular endpoints for registering, logging in, and managing user sessions via token-based authentication.
+Welcome to the official **MQL BackEnd** repository — This is a backend project built using Django and Django REST Framework (DRF).
+
+To simplify frontend development and interaction with APIs, a dedicated apiHandler.js file has been provided. This utility streamlines API communication and makes the behavior of each endpoint clearer and more accessible for frontend developers.
+
+🚀 Key Features
+User registration and login functionality for clients
+
+Ability for users to submit orders with detailed descriptions and a list of required tools
+
+An admin panel to track and manage submitted orders
+
+⚠️ Note: This is an MVP (Minimum Viable Product) version – the initial functional release intended to demonstrate the core features.
+
 
 ---
 
