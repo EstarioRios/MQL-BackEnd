@@ -88,11 +88,12 @@ The backend will be available at: http://127.0.0.1:8000/
 
 ## 🔌 API Endpoints
 Endpoint	Method	Description
+```txt
 /register/	POST	Register a new user
 /login/	POST	Authenticate & receive token
 /profile/	GET	Retrieve authenticated user
 /logout/	POST	Logout user (if available)
-
+```
 These endpoints are implemented inside the AuthenticationSystem app using Django REST views and serializers.
 
 ## 🧪 Frontend Integration
